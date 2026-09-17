@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Protótipo: qualquer usuário PROVISIONADO PELA REDE lê/escreve qualquer
+// coleção. O escopo fino por perfil/serviço/especialidade é aplicado no
+// cliente (React) — mesmo nível de confiança que o protótipo vanilla
+// anterior (localStorage, sem nenhuma proteção). Ver web/README.md.
+//
+// "Provisionado" (não só "autenticado") importa porque a config do Firebase
+// é pública por natureza (fica no bundle do site e não há como escondê-la)
+// — qualquer pessoa pode criar uma conta de e-mail/senha nova com a mesma
+// API key, sem nunca ter usado o app. `autorizado()` bloqueia essas contas
+// avulsas: só passa quem tem um documento em `authUsers/{uid}`, escrito
+// pelo script de seed (scripts/seed.ts) ou, mais tarde, por um coordenador
+// cadastrando alguém em Configurações — nunca pela própria pessoa se
+// registrando.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function autorizado() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/authUsers/$(request.auth.uid));
+    }
+
+    // A tela de login lê nome/perfil/serviço ANTES de autenticar (acesso
+    // rápido de demonstração + dropdown de troca de perfil) — nenhum dado
+    // sensível aqui (sem CNS/CPF de paciente), então essas duas coleções
+    // ficam de leitura pública. Escrita continua exigindo provisionamento.
+    match /usuarios/{id} {
+      allow read: if true;
+      allow write: if autorizado();
+    }
+    match /servicos/{id} {
+      allow read: if true;
+      allow write: if autorizado();
+    }
+
+    // Ninguém lê nem escreve o próprio mapeamento — só o script de seed
+    // (Admin, fora das regras) e o fluxo de criar usuário escrevem aqui,
+    // sempre a partir de uma sessão já autorizada.
+    match /authUsers/{uid} {
+      allow read, write: if autorizado();
+    }
+
+    match /{document=**} {
+      allow read, write: if autorizado();
+    }
+  }
+}

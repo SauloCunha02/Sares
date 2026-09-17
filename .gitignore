@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Cache local do Firebase CLI (hashes de deploy) — não é conteúdo do projeto
+.firebase
+
+# Config do Firebase — não é segredo por natureza (vai pro bundle do site de
+# qualquer jeito), mas não precisa estar versionada; use .env.example como
+# molde. A segurança real está nas regras do Firestore (autorizado() em
+# firestore.rules), não em esconder isso.
+.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

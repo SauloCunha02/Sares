@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "sares-app"
+  },
+  "targets": {
+    "sares-app": {
+      "hosting": {
+        "sares-site": [
+          "sares"
+        ]
+      }
+    }
+  }
+}
